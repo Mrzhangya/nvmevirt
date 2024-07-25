@@ -193,6 +193,8 @@ static void NVMEV_DISPATCHER_INIT(struct nvmev_dev *nvmev_vdev)
 	nvmev_vdev->nvmev_dispatcher = kthread_create(nvmev_dispatcher, NULL, "nvmev_dispatcher");
 	if (nvmev_vdev->config.cpu_nr_dispatcher != -1)
 		kthread_bind(nvmev_vdev->nvmev_dispatcher, nvmev_vdev->config.cpu_nr_dispatcher);
+
+	/** wakup threader*/
 	wake_up_process(nvmev_vdev->nvmev_dispatcher);
 }
 
@@ -431,9 +433,11 @@ static void NVMEV_STORAGE_INIT(struct nvmev_dev *nvmev_vdev)
 			nvmev_vdev->config.storage_start + nvmev_vdev->config.storage_size,
 			BYTE_TO_MB(nvmev_vdev->config.storage_size));
 
+	/** allocate io unit stat */
 	nvmev_vdev->io_unit_stat = kzalloc(
 		sizeof(*nvmev_vdev->io_unit_stat) * nvmev_vdev->config.nr_io_units, GFP_KERNEL);
 
+	/** address remmap */
 	nvmev_vdev->storage_mapped = memremap(nvmev_vdev->config.storage_start,
 					      nvmev_vdev->config.storage_size, MEMREMAP_WB);
 
@@ -441,6 +445,8 @@ static void NVMEV_STORAGE_INIT(struct nvmev_dev *nvmev_vdev)
 		NVMEV_ERROR("Failed to map storage memory.\n");
 
 	nvmev_vdev->proc_root = proc_mkdir("nvmev", NULL);
+
+	/** create thread*/
 	nvmev_vdev->proc_read_times =
 		proc_create("read_times", 0664, nvmev_vdev->proc_root, &proc_file_fops);
 	nvmev_vdev->proc_write_times =
@@ -604,12 +610,13 @@ static int NVMeV_init(void)
 {
 	int ret = 0;
 
+	/** print the nvmevir version */
 	__print_base_config();
 
 	nvmev_vdev = VDEV_INIT();
 	if (!nvmev_vdev)
 		return -EINVAL;
-
+	/** load the configs */
 	if (!__load_configs(&nvmev_vdev->config)) {
 		goto ret_err;
 	}

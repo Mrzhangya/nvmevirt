@@ -432,10 +432,12 @@ static struct pci_bus *__create_pci_bus(void)
 struct nvmev_dev *VDEV_INIT(void)
 {
 	struct nvmev_dev *nvmev_vdev;
+	/** allocte the nvme_dev size */
 	nvmev_vdev = kzalloc(sizeof(*nvmev_vdev), GFP_KERNEL);
 
 	nvmev_vdev->virtDev = kzalloc(PAGE_SIZE, GFP_KERNEL);
 
+	/** caculate address*/
 	nvmev_vdev->pcihdr = nvmev_vdev->virtDev + OFFS_PCI_HDR;
 	nvmev_vdev->pmcap = nvmev_vdev->virtDev + OFFS_PCI_PM_CAP;
 	nvmev_vdev->msixcap = nvmev_vdev->virtDev + OFFS_PCI_MSIX_CAP;
