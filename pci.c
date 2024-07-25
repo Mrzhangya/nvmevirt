@@ -135,6 +135,8 @@ bool nvmev_proc_bars(void)
 		memcpy(&old_bar->nssr, &bar->nssr, sizeof(old_bar->nssr));
 	}
 #endif
+
+ 	/**  Admin Queue Attributes */
 	if (old_bar->aqa != bar->u_aqa) {
 		// Initalize admin queue
 		NVMEV_DEBUG("%s: aqa 0x%x -> 0x%x\n", __func__, old_bar->aqa, bar->u_aqa);
@@ -158,6 +160,8 @@ bool nvmev_proc_bars(void)
 
 		goto out;
 	}
+
+	/**  Admin SQ Base Address */
 	if (old_bar->asq != bar->u_asq) {
 		if (queue == NULL) {
 			/*
@@ -195,6 +199,8 @@ bool nvmev_proc_bars(void)
 
 		goto out;
 	}
+
+	/**  Admin CQ Base Address */
 	if (old_bar->acq != bar->u_acq) {
 		if (queue == NULL) {
 			// See comment above
